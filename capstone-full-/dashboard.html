@@ -1,0 +1,807 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GastroTrack - Dashboard</title>
+
+  <!-- Fonts + Chart.js -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ===== CSS VARIABLES ===== */
+    :root {
+      --brand: #ff4400;
+      --surface: #f7f1ea;
+      --ink: #1b1b1b;
+      --muted: #81858f;
+      --line: #e3d9cc;
+      --color-sidebar: #ff4400;
+      --color-sidebar-hover: #2d3341;
+      --btn: #3a3a3a;
+      --btn-ink: #fff;
+      --good: #31c24a;
+      --warn: #ffb020;
+      --bad: #e55454;
+      --bubble: #3f6b86;
+      --bubble-ink: #fff;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --font: "Inter", system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--brand);
+      color: var(--ink);
+      font-family: var(--font);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 140px;
+      background: var(--color-sidebar);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 0;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .brand .logo {
+      width: 50px;
+      height: 50px;
+      background: var(--brand);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(242, 74, 46, 0.3);
+    }
+
+    .brand span {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      letter-spacing: -0.3px;
+    }
+
+    /* ===== NAVIGATION ===== */
+    .nav {
+      display: flex;
+      flex-direction: column;
+      padding: 0 12px;
+    }
+
+    .nav a {
+      position: relative;
+      display: block;
+      padding: 14px 12px;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+      text-align: center;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    .nav a:hover {
+      background: var(--color-sidebar-hover);
+      color: #fff;
+    }
+
+    .nav a.active {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(242, 74, 46, 0.4);
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main {
+      margin-left: 140px;
+      flex: 1;
+      background: var(--surface);
+      border-top-left-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 32px 40px;
+      min-height: 100vh;
+    }
+
+    .main h2 {
+      margin: 0 0 18px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    /* ===== GRID LAYOUT ===== */
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+
+    .single-row {
+      margin-top: 8px;
+    }
+
+    /* ===== CARD STYLES ===== */
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 14px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .rounded-bubble {
+      background: linear-gradient(120deg, #4c88a9 0%, #3f6b86 60%);
+      color: #fff;
+    }
+
+    /* ===== SALES & DEMAND CARD ===== */
+    .sales-inner {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+    }
+
+    .chart-wrap {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      padding: 10px;
+      height: 220px;
+    }
+
+    .pred-block {
+      display: flex;
+      flex-direction: column;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .pred-block h4 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .pred-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px;
+      margin-top: 6px;
+      background: rgba(0, 0, 0, 0.12);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    /* ===== MENU PERFORMANCE ===== */
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .list > div {
+      font-size: 14px;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .dot.green {
+      background: var(--good);
+    }
+
+    .dot.red {
+      background: var(--bad);
+    }
+
+    /* ===== INVENTORY OVERVIEW ===== */
+    .inv-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .bar {
+      height: 12px;
+      background: #eee;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .bar.ok span {
+      background: var(--good);
+    }
+
+    .bar.warn span {
+      background: var(--warn);
+    }
+
+    .bar.bad span {
+      background: var(--bad);
+    }
+
+    /* ===== EXPIRY ALERTS ===== */
+    .alert {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .badge {
+      min-width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .b-bad {
+      background: var(--bad);
+    }
+
+    .b-warn {
+      background: var(--warn);
+    }
+
+    /* ===== SUGGESTIONS ===== */
+    .suggest-messages-layout {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .suggestions-content .msg {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .message-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #333;
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      position: relative;
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    .message-item:hover {
+      background: #444;
+      transform: translateY(-2px);
+    }
+
+    .message-badge {
+      background: #e94c4c;
+      color: #fff;
+      font-weight: 800;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      background: var(--btn);
+      color: var(--btn-ink);
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-block;
+      text-decoration: none;
+      text-align: center;
+      font-size: 13px;
+      transition: all 0.2s ease;
+      position: relative;
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    .btn:hover {
+      background: #2a2a2a;
+      transform: translateY(-1px);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: #333;
+      border: 1px solid #d0c7bb;
+    }
+
+    .btn.secondary:hover {
+      background: #f5f5f5;
+    }
+
+    /* ===== UTILITY CLASSES ===== */
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .space {
+      height: 10px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sales-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .suggest-messages-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 80px;
+      }
+      
+      .brand span {
+        font-size: 11px;
+      }
+      
+      .nav a {
+        padding: 12px 8px;
+        font-size: 11px;
+      }
+      
+      .main {
+        margin-left: 80px;
+        padding: 24px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+    <aside class="sidebar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><span style="font-size:28px">👨🏻‍🍳</span></div>
+      <span>GastroTrack</span>
+    </div>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a class="active"  href="dashboard.html"><span>Dashboard</span></a>
+      <a href="inventory.html"><span>Inventory</span></a>
+      <a href="expiry-calendar.html"><span>Expiry Calendar</span></a>
+      <a href="sales-report.html"><span>Sales Report</span></a>
+      <a href="cost-waste.html"><span>Cost & Waste</span></a>
+      <a href="suggestions.html"><span>Suggestions</span></a>
+      <a href="menu-insights.html"><span>Menu Insights</span></a>
+    </nav>
+
+    <div class="spacer"></div>
+    <nav class="nav">
+      <a href="profile.html"><span>Profile</span></a>
+      <a href="loginpage.html"><span>Log Out</span></a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <h2 id="welcome-text">Welcome back, 👋</h2>
+
+    <!-- Row 1: Sales & Menu Performance -->
+    <section class="grid">
+      <!-- Sales & Demand -->
+      <div class="card rounded-bubble">
+        <h3>Sales & Demand</h3>
+        <div class="sales-inner">
+          <div class="chart-wrap">
+            <canvas id="salesChart"></canvas>
+            <div class="space"></div>
+            <a class="btn" href="sales-report.html">View Full Report</a>
+          </div>
+          <div class="pred-block" aria-label="Predicted Demand Next 7 Days">
+  <h4>Predicted Demand</h4>
+  <div class="muted" id="pred-range-label">Next 7 Days</div>
+
+  <!-- REPLACED STATIC ITEMS WITH DYNAMIC CONTAINER -->
+  <div id="predictionsContainer">
+    <p class="muted">Loading...</p>
+  </div>
+
+  <div style="flex:1"></div>
+  <a class="btn" style="background:#ffffff22; color:#fff; border:1px solid rgba(255,255,255,.12)" href="menu-insights.html">View Predictions</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu Performance -->
+      <div class="card">
+        <h3>Menu Performance</h3>
+         <div class="muted" style="margin-bottom:6px">Top 3 Selling</div>
+  <div id="top3-list" class="list" style="margin-bottom:10px"></div>
+
+  <div class="muted" style="margin:6px 0 10px">Bottom 3 Selling</div>
+  <div id="bottom3-list" class="list"></div>
+
+  <div class="space"></div>
+  <div class="row">
+    <a class="btn secondary" href="menu-insights.html">View Menu Insights</a>
+    <a class="btn" href="sales-report.html">Quick Log Sales</a>
+  </div>
+</div>
+    </section>
+
+    <!-- Row 2: Inventory & Expiry Alerts -->
+<section class="grid" style="margin-top:8px">
+  <!-- INVENTORY OVERVIEW -->
+  <div class="card">
+    <h3>Inventory Overview</h3>
+    <div id="inventory-list">
+      <!-- JS will insert inventory items here -->
+      <div class="muted">Loading...</div>
+    </div>
+    <div class="space"></div>
+    <a class="btn" href="inventory.html">View Full Inventory</a>
+  </div>
+
+ <!-- EXPIRY ALERTS -->
+<div class="card">
+  <h3>Expiry Alerts</h3>
+  <div id="expiry-alerts">
+    <!-- JS will insert dynamic expiry alerts here -->
+    <div class="muted">Checking expiry...</div>
+  </div>
+  <div class="space"></div>
+  <a class="btn" href="expiry-calendar.html">View Expiry Calendar</a>
+</div>
+</section>
+
+    <!-- Row 3: Suggestions -->
+ <!-- Suggestions (dynamic) -->
+<section class="single-row">
+  <div class="card">
+    <h3>Suggestions by GastroTrack</h3>
+    <div class="suggest-messages-layout">
+      <div class="suggestions-content" id="suggestions-list">
+        <div class="muted">Loading suggestions...</div>
+      </div>
+      <a class="message-item" href="suggestions.html">
+        <div class="message-badge" id="suggestions-count">0</div>
+        <div class="message-text">View All Messages</div>
+      </a>
+    </div>
+  </div>
+</section>
+  </main>
+
+  <!-- JavaScript: Chart + Navigation -->
+  <script id="chart-data" type="application/json">{{ chart_data | tojson }}</script>
+<script>
+  // Firebase welcome (keep if you use Firebase auth)
+  if (window.firebase && firebase.auth) {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        const displayName = user.displayName || "User";
+        document.getElementById("welcome-text").textContent = `Welcome back, ${displayName} 👋`;
+      }
+    });
+  }
+
+    // Chart.js initialization
+    const el = document.getElementById('salesChart');
+    if (!el || !window.Chart) return;
+
+    // Chart data injected by Flask (as JSON)
+    // Read JSON from a dedicated script[type="application/json"] to avoid raw template tokens breaking JS parsing
+    let chartData = {};
+    try {
+      const chartDataEl = document.getElementById('chart-data');
+      if (chartDataEl) {
+        chartData = JSON.parse(chartDataEl.textContent || '{}');
+      }
+    } catch (e) {
+      console.error('Invalid chart data JSON:', e);
+      chartData = {};
+    }
+
+    // Collect all months and sort them
+    const monthSet = new Set();
+    for (const item in chartData) {
+      if (chartData[item] && typeof chartData[item] === 'object') {
+        Object.keys(chartData[item]).forEach(m => monthSet.add(m));
+      }
+    }
+    const sortedMonths = Array.from(monthSet).sort();
+
+    // Build datasets
+    const datasets = [];
+    let idx = 0;
+    for (const item in chartData) {
+      const row = chartData[item] || {};
+      const dataPoints = sortedMonths.map(m => row[m] || 0);
+      datasets.push({
+        label: item,
+        data: dataPoints,
+        borderWidth: 2,
+        tension: 0.35,
+        fill: false,
+        borderColor: '#' + Math.floor(Math.random()*16777215).toString(16),
+        pointRadius: 3,
+        pointHoverRadius: 5
+      });
+      idx++;
+    }
+
+    new Chart(el.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: sortedMonths,
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#fff',
+              boxWidth: 10,
+              font: { size: 12 }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            padding: 12,
+            cornerRadius: 8
+          }
+        },
+        scales: {
+          x: { ticks: { color: '#fff' }, grid: { display: false } },
+          y: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+        }
+      }
+    });
+
+    // ===== Fetch Predicted Demand from Flask API =====
+    fetch("/api/demand_forecast")
+      .then(r => r.json())
+      .then(predData => {
+        const container = document.querySelector(".pred-block");
+        if (!container) return;
+        // remove static pred-item elements if present
+        container.querySelectorAll(".pred-item").forEach(p => p.remove());
+
+        Object.entries(predData).forEach(([item, change]) => {
+          const div = document.createElement("div");
+          div.className = "pred-item";
+          const color = (change >= 0) ? "#c7ffd9" : "#ffd6d6";
+          const arrow = (change >= 0) ? "↑" : "↓";
+          div.innerHTML = `<div>${item}</div><div style="color:${color}">${arrow} ${Math.abs(change)}%</div>`;
+          // insert before the spacer/button area if present
+          const spacer = container.querySelector('div[style*="flex:1"]');
+          if (spacer) container.insertBefore(div, spacer);
+          else container.appendChild(div);
+        });
+      })
+      .catch(err => console.error("Error loading predictions:", err));
+
+      // ===== Fetch Expiry Alerts from Flask API =====
+fetch("/api/expiry_alerts")
+  .then(r => r.json())
+  .then(expiryData => {
+    const container = document.getElementById("expiry-alerts");
+    if (!container) return;
+    
+    // Clear loading message
+    container.innerHTML = '';
+    
+    if (!expiryData || expiryData.length === 0) {
+      container.innerHTML = '<div class="muted">No items expiring soon</div>';
+      return;
+    }
+    
+    // Create alert for each expiring item
+    expiryData.forEach(item => {
+      const alertDiv = document.createElement("div");
+      alertDiv.className = "alert";
+      
+      const daysLeft = item.days_left || 0;
+      const badgeClass = daysLeft <= 2 ? 'b-bad' : 'b-warn';
+      
+      alertDiv.innerHTML = `
+        <div class="badge ${badgeClass}">${daysLeft}</div>
+        <div>
+          <strong>${item.item_name}</strong> expires in ${daysLeft} days
+        </div>
+      `;
+      
+      container.appendChild(alertDiv);
+    });
+  })
+  .catch(err => {
+    console.error("Error loading expiry alerts:", err);
+    const container = document.getElementById("expiry-alerts");
+    if (container) {
+      container.innerHTML = '<div class="muted">Failed to load expiry data</div>';
+    }
+  });
+
+  // Load suggestions
+fetch("/api/suggestions")
+  .then(r => r.json())
+  .then(data => {
+    const list = document.getElementById("suggestions-list");
+    const countEl = document.getElementById("suggestions-count");
+    const smart = document.getElementById("suggestionsContainer");
+    if (list) {
+      list.innerHTML = "";
+      if (!data.items || data.items.length === 0) {
+        list.innerHTML = '<div class="muted">No suggestions right now</div>';
+        if (countEl) countEl.textContent = "0";
+      } else {
+        data.items.slice(0, 5).forEach(s => {
+          const div = document.createElement("div");
+          div.className = "msg";
+          div.innerHTML = `${s.message} — <strong>${s.action}</strong>.`;
+          list.appendChild(div);
+        });
+        if (countEl) countEl.textContent = data.items.length > 9 ? "9+" : data.items.length;
+      }
+    }
+    if (smart) {
+      if (!data.items || data.items.length === 0) {
+        smart.innerHTML = '<p class="muted">No smart suggestions.</p>';
+      } else {
+        smart.innerHTML = data.items.slice(0,3).map(s =>
+          `<div class="msg">${s.message} — <strong>${s.action}</strong></div>`
+        ).join('');
+      }
+    }
+  })
+  .catch(() => {
+    const smart = document.getElementById("suggestionsContainer");
+    if (smart) smart.innerHTML = '<p class="muted">Failed to load suggestions.</p>';
+  });
+
+/* Replace old prediction fetch block with this */
+fetch("/api/predicted_demand")
+  .then(r => r.json())
+  .then(items => {
+    const box = document.getElementById("predictionsContainer");
+    if (!box) return;
+    if (!Array.isArray(items) || items.length === 0) {
+      box.innerHTML = '<div class="muted">No prediction data</div>';
+      return;
+    }
+    box.innerHTML = items.map(p => {
+      const up = p.change >= 0;
+      const color = up ? "#c7ffd9" : "#ffd6d6";
+      const arrow = up ? "↑" : "↓";
+      const pct = Math.round(Math.abs(p.change) * 100);
+      return `
+        <div class="pred-item">
+          <div>${p.item}</div>
+          <div style="color:${color}">${arrow} ${pct}%</div>
+        </div>`;
+    }).join("");
+  })
+  .catch(err => {
+    const box = document.getElementById("predictionsContainer");
+    if (box) box.innerHTML = '<div class="muted">Failed to load predictions</div>';
+    console.error("Predicted demand error:", err);
+  });
+  
+  // Hard navigation fallback (ensures links work even if something blocks them)
+  (function() {
+    function hardNav(e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href === '#') return;
+      try {
+        setTimeout(() => {
+          window.location.href = href;
+        }, 0);
+      } catch (err) {
+        window.location.href = href;
+      }
+    }
+    document.addEventListener('click', hardNav, true);
+  })();
+</script>

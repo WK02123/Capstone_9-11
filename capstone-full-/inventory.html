@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GastroTrack - Inventory</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== CSS VARIABLES ===== */
+    :root {
+      /* Colors */
+      --color-primary: #e14632;
+      --color-sidebar: #ff4400;
+      --color-sidebar-hover: #2d3341;
+      --color-text-primary: #1f2430;
+      --color-text-secondary: #6a6a6a;
+      --color-bg-main: #f6efe6;
+      --color-bg-card: #e2e2e2;
+      --color-bg-card-header: #cfcfcf;
+      --color-border: #d6d6d6;
+      
+      /* Progress bar colors */
+      --color-progress-good: #22b56f;
+      --color-progress-warn: #f1c43a;
+      --color-progress-bad: #d93e3e;
+      --color-progress-empty: #dcdcdc;
+      
+      /* Spacing */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 12px;
+      --spacing-lg: 18px;
+      --spacing-xl: 24px;
+      
+      /* Border radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      
+      /* Shadows */
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 6px 14px rgba(0, 0, 0, 0.12);
+      
+      /* Typography */
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      min-height: 100vh;
+      background: var(--color-bg-main);
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 140px;
+      background: var(--color-sidebar);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 0;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      background: var(--color-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(225, 70, 50, 0.3);
+    }
+
+    .brand span {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      letter-spacing: -0.3px;
+    }
+
+    /* ===== NAVIGATION ===== */
+    .nav {
+      display: flex;
+      flex-direction: column;
+      padding: 0 12px;
+    }
+
+    .nav a {
+      position: relative;
+      display: block;
+      padding: 14px 12px;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+      text-align: center;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    .nav a:hover {
+      background: var(--color-sidebar-hover);
+      color: #fff;
+    }
+
+    .nav a.active {
+      background: var(--color-primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(225, 70, 50, 0.4);
+    }
+
+    .spacer {
+      flex: 1;
+      min-height: 40px;
+    }
+
+    /* ===== MAIN CONTENT AREA ===== */
+    .main {
+      margin-left: 140px;
+      flex: 1;
+      padding: 32px 160px 40px 40px;
+      background: var(--color-bg-main);
+      min-height: 100vh;
+    }
+
+    .main > h2 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--color-text-primary);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    /* ===== INVENTORY CONTAINER ===== */
+    .inventory-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 1400px;
+    }
+
+    /* ===== INVENTORY CARD ===== */
+    .inventory-card {
+      background: #e2e2e2;
+      border: 1px solid #d0d0d0;
+      border-radius: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .inventory-card h2 {
+      margin: 0 0 16px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #1f2430;
+      text-align: center;
+      background: #cfcfcf;
+      border-radius: 14px;
+      padding: 10px 14px;
+      letter-spacing: -0.2px;
+    }
+
+    /* ===== INGREDIENTS LIST ===== */
+    .ingredients-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ingredient-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .ingredient-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: #2f3342;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-bar {
+      height: 11px;
+      background: #ffffff;
+      border: 1px solid #d5d5d5;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    /* Progress colors */
+    .progress-good {
+      background: linear-gradient(180deg, #2dd47e 0%, #22b56f 100%);
+    }
+
+    .progress-warn {
+      background: linear-gradient(180deg, #ffd54f 0%, #f1c43a 100%);
+    }
+
+    .progress-bad {
+      background: linear-gradient(180deg, #e85050 0%, #d93e3e 100%);
+    }
+
+    .progress-empty {
+      background: #e8e8e8;
+    }
+
+    /* ===== RIGHT RAIL ACTIONS ===== */
+    .right-rail {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 110px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 50;
+    }
+
+    .right-rail::before {
+      content: "";
+      position: absolute;
+      left: -18px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      background: #e14632;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px var(--color-bg-main);
+    }
+
+    .rail-btn {
+      text-transform: uppercase;
+      font-weight: 800;
+      font-size: 10px;
+      line-height: 1.3;
+      letter-spacing: 0.3px;
+      color: #fff;
+      background: #6a6a6a;
+      border: 1px solid #5a5a5a;
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transition: all 0.2s ease;
+    }
+
+    .rail-btn:hover {
+      background: #5f5f5f;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .rail-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ===== BOTTOM ACTIONS (MOBILE) ===== */
+    .bottom-actions {
+      display: none;
+      margin-top: 20px;
+      gap: 12px;
+    }
+
+    /* ===== MODAL STYLES ===== */
+    .modal-dialog {
+      border: none;
+      border-radius: var(--radius-lg);
+      padding: 0;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-dialog::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+      padding: 28px;
+    }
+
+    .modal-content h3 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: var(--font-family);
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(225, 70, 50, 0.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-cancel {
+      background: #e2e2e2;
+      color: var(--color-text-primary);
+    }
+
+    .btn-cancel:hover {
+      background: #d5d5d5;
+    }
+
+    .btn-submit {
+      background: var(--color-primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(225, 70, 50, 0.3);
+    }
+
+    .btn-submit:hover {
+      background: #c93a28;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(225, 70, 50, 0.4);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: #6a6a6a;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(106, 106, 106, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: #5a5a5a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(106, 106, 106, 0.4);
+    }
+
+    .btn-danger {
+      background: #d93e3e;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(217, 62, 62, 0.3);
+    }
+
+    .btn-danger:hover {
+      background: #c02020;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(217, 62, 62, 0.4);
+    }
+
+    .btn-secondary:active,
+    .btn-danger:active {
+      transform: translateY(0);
+    }
+
+    /* ===== LOADING ANIMATION ===== */
+    @keyframes shimmer {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    .ingredient-row.loading .progress-fill {
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    /* ===== SCROLLBAR STYLING ===== */
+    .ingredients-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .ingredients-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .ingredients-list::-webkit-scrollbar-thumb {
+      background: #c0c0c0;
+      border-radius: 3px;
+    }
+
+    .ingredients-list::-webkit-scrollbar-thumb:hover {
+      background: #a0a0a0;
+    }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 1200px) {
+      .inventory-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .main {
+        padding: 32px 40px;
+      }
+      
+      .right-rail {
+        display: none;
+      }
+      
+      .bottom-actions {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      
+      .bottom-actions .rail-btn {
+        flex: 1;
+        min-width: 160px;
+        padding: 16px 20px;
+        font-size: 11px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 80px;
+      }
+      
+      .brand span {
+        font-size: 11px;
+      }
+      
+      .nav a {
+        padding: 12px 8px;
+        font-size: 11px;
+      }
+      
+      .main {
+        margin-left: 80px;
+        padding: 24px 20px;
+      }
+      
+      .ingredient-row {
+        grid-template-columns: 120px 1fr;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><span style="font-size:28px">👨🏻‍🍳</span></div>
+      <span>GastroTrack</span>
+    </div>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="dashboard.html"><span>Dashboard</span></a>
+      <a class="active" href="inventory.html"><span>Inventory</span></a>
+      <a href="expiry-calendar.html"><span>Expiry Calendar</span></a>
+      <a href="sales-report.html"><span>Sales Report</span></a>
+      <a href="cost-waste.html"><span>Cost & Waste</span></a>
+      <a href="suggestions.html"><span>Suggestions</span></a>
+      <a href="menu-insights.html"><span>Menu Insights</span></a>
+    </nav>
+
+    <div class="spacer"></div>
+    <nav class="nav">
+      <a href="profile.html"><span>Profile</span></a>
+      <a href="logout.html"><span>Log Out</span></a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <h2>Inventory</h2>
+
+    <section class="inventory-container">
+      <!-- Perishable Ingredients Card -->
+      <div class="inventory-card">
+        <h2>Perishable Ingredients</h2>
+        <div class="ingredients-list" id="perishable-list"></div>
+      </div>
+
+      <!-- Semi-perishable Ingredients Card -->
+      <div class="inventory-card">
+        <h2>Semi-perishable Ingredients</h2>
+        <div class="ingredients-list" id="semiperishable-list"></div>
+      </div>
+    </section>
+
+    <!-- Bottom Actions for Mobile -->
+    <div class="bottom-actions">
+      <button class="rail-btn" onclick="openRestockModal()">Log Restock</button>
+      <button class="rail-btn" onclick="openEditModal()">Edit Ingredients</button>
+    </div>
+
+    <!-- Floating Right Rail (Desktop) -->
+    <div class="right-rail" aria-label="Quick actions">
+      <button class="rail-btn" onclick="openRestockModal()">LOG<br>RESTOCK</button>
+      <button class="rail-btn" onclick="openEditModal()">EDIT<br>INGREDIENTS</button>
+    </div>
+
+    <!-- Log Restock Modal -->
+    <dialog id="restockModal" class="modal-dialog">
+      <div class="modal-content">
+        <h3>Log Restock</h3>
+        <form id="restockForm">
+          <div class="form-group">
+            <label for="ingredientSelect">Ingredient</label>
+            <select id="ingredientSelect" class="form-control" required>
+              <option value="">Select ingredient...</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" class="form-control" min="0" step="0.1" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="unit">Unit</label>
+            <select id="unit" class="form-control" required>
+              <option value="kg">kg</option>
+              <option value="L">L</option>
+              <option value="pcs">pcs</option>
+              <option value="g">g</option>
+              <option value="ml">ml</option>
+            </select>
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" class="btn btn-cancel" onclick="closeRestockModal()">Cancel</button>
+            <button type="submit" class="btn btn-submit">Log Restock</button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+
+    <!-- Edit Ingredients Modal -->
+    <dialog id="editModal" class="modal-dialog">
+      <div class="modal-content">
+        <h3>Edit Ingredients</h3>
+        <form id="editForm">
+          <div class="form-group">
+            <label for="editIngredient">Ingredient</label>
+            <select id="editIngredient" class="form-control" required>
+              <option value="">Select ingredient...</option>
+            </select>
+          </div>
+          
+          <button type="button" class="btn btn-submit" onclick="openAddIngredientModal()" style="margin-bottom: 20px; width: 100%;">+ Add New Ingredient</button>
+          
+          <div class="form-group">
+            <label for="currentStock">Current Stock</label>
+            <input type="number" id="currentStock" class="form-control" min="0" step="0.1" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="requiredStock">Required Stock (Capacity)</label>
+            <input type="number" id="requiredStock" class="form-control" min="0" step="0.1" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" class="form-control" required>
+              <option value="">Select category...</option>
+              <option value="perishable">Perishable</option>
+              <option value="semi-perishable">Semi-perishable</option>
+            </select>
+          </div>
+          
+          <!-- Ingredient Status Buttons -->
+          <div class="form-group" id="ingredientStatusButtons" style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary" id="disableBtn" onclick="disableIngredient()" style="flex: 1; min-width: 120px;">Disable</button>
+            <button type="button" class="btn btn-submit" id="enableBtn" onclick="enableIngredient()" style="flex: 1; min-width: 120px; display: none;">Re-Enable</button>
+            <button type="button" class="btn btn-danger" id="deleteBtn" onclick="deleteIngredient()" style="flex: 1; min-width: 120px;">Delete</button>
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" class="btn btn-cancel" onclick="closeEditModal()">Cancel</button>
+            <button type="submit" class="btn btn-submit">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+
+    <!-- Add New Ingredient Modal -->
+    <dialog id="addIngredientModal" class="modal-dialog">
+      <div class="modal-content">
+        <h3>Add New Ingredient</h3>
+        <form id="addIngredientForm">
+          <div class="form-group">
+            <label for="newIngredientName">Ingredient Name</label>
+            <input type="text" id="newIngredientName" class="form-control" placeholder="e.g., Coffee Beans" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="newCurrentStock">Current Stock</label>
+            <input type="number" id="newCurrentStock" class="form-control" min="0" step="0.1" value="0" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="newRequiredStock">Required Stock (Capacity)</label>
+            <input type="number" id="newRequiredStock" class="form-control" min="0" step="0.1" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="newCategory">Category</label>
+            <select id="newCategory" class="form-control" required>
+              <option value="">Select category...</option>
+              <option value="perishable">Perishable</option>
+              <option value="semi-perishable">Semi-perishable</option>
+            </select>
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" class="btn btn-cancel" onclick="closeAddIngredientModal()">Cancel</button>
+            <button type="submit" class="btn btn-submit">Add Ingredient</button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+  </main>
+
+  <!-- JavaScript -->
+<script>
+  // Modal elements
+  const restockModal = document.getElementById('restockModal');
+  const editModal = document.getElementById('editModal');
+  const addIngredientModal = document.getElementById('addIngredientModal');
+
+  // Modal control functions
+  function openRestockModal() { 
+    loadIngredientsDropdown('ingredientSelect');
+    restockModal.showModal(); 
+  }
+  function closeRestockModal() { 
+    restockModal.close(); 
+    document.getElementById('restockForm').reset(); 
+  }
+  
+  function openEditModal() { 
+    loadIngredientsDropdown('editIngredient');
+    editModal.showModal(); 
+  }
+  function closeEditModal() { 
+    editModal.close(); 
+    document.getElementById('editForm').reset(); 
+  }
+  
+  function openAddIngredientModal() {
+    addIngredientModal.showModal();
+  }
+  function closeAddIngredientModal() {
+    addIngredientModal.close();
+    document.getElementById('addIngredientForm').reset();
+  }
+
+  // Load ingredients into dropdown
+  async function loadIngredientsDropdown(selectId) {
+    const select = document.getElementById(selectId);
+    select.innerHTML = '<option value="">Loading...</option>';
+    
+    try {
+      const res = await fetch('http://127.0.0.1:5000/api/inventory');
+      if (!res.ok) throw new Error('Failed to load ingredients');
+      const data = await res.json();
+      
+      select.innerHTML = '<option value="">Select ingredient...</option>';
+      data.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.item_id || item.item_name;
+        option.textContent = item.item_name;
+        option.dataset.stockLevel = item.stock_level;
+        option.dataset.capacity = item.capacity;
+        option.dataset.category = item.category || '';
+        option.dataset.status = item.status || 'active';
+        select.appendChild(option);
+      });
+    } catch (err) {
+      console.error('Failed to load ingredients:', err);
+      select.innerHTML = '<option value="">Failed to load</option>';
+    }
+  }
+
+  // Handle ingredient selection change
+  document.getElementById('editIngredient').addEventListener('change', function() {
+    const selected = this.options[this.selectedIndex];
+    if (selected.value) {
+      document.getElementById('currentStock').value = selected.dataset.stockLevel || 0;
+      document.getElementById('requiredStock').value = selected.dataset.capacity || 0;
+      document.getElementById('category').value = selected.dataset.category || '';
+      
+      // Toggle enable/disable buttons based on status
+      const status = selected.dataset.status || 'active';
+      document.getElementById('disableBtn').style.display = status === 'active' ? 'block' : 'none';
+      document.getElementById('enableBtn').style.display = status === 'disabled' ? 'block' : 'none';
+    }
+  });
+
+  // Ingredient management functions
+  async function disableIngredient() {
+    const select = document.getElementById('editIngredient');
+    const ingredientId = select.value;
+    const ingredientName = select.options[select.selectedIndex].text;
+    
+    if (!ingredientId) {
+      alert('Please select an ingredient first');
+      return;
+    }
+    
+    if (!confirm(`Disable "${ingredientName}"? It will be hidden from active inventory.`)) {
+      return;
+    }
+    
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/api/inventory/${ingredientId}/disable`, { 
+        method: 'POST' 
+      });
+      
+      if (!res.ok) throw new Error('Failed to disable');
+      
+      alert(`"${ingredientName}" has been disabled! ✅`);
+      closeEditModal();
+      setTimeout(loadInventory, 400);
+    } catch (err) {
+      console.error('Failed to disable ingredient:', err);
+      alert('Failed to disable ingredient. Please try again.');
+    }
+  }
+
+  async function enableIngredient() {
+    const select = document.getElementById('editIngredient');
+    const ingredientId = select.value;
+    const ingredientName = select.options[select.selectedIndex].text;
+    
+    if (!ingredientId) {
+      alert('Please select an ingredient first');
+      return;
+    }
+    
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/api/inventory/${ingredientId}/enable`, { 
+        method: 'POST' 
+      });
+      
+      if (!res.ok) throw new Error('Failed to enable');
+      
+      alert(`"${ingredientName}" has been re-enabled! ✅`);
+      closeEditModal();
+      setTimeout(loadInventory, 400);
+    } catch (err) {
+      console.error('Failed to enable ingredient:', err);
+      alert('Failed to enable ingredient. Please try again.');
+    }
+  }
+
+  async function deleteIngredient() {
+    const select = document.getElementById('editIngredient');
+    const ingredientId = select.value;
+    const ingredientName = select.options[select.selectedIndex].text;
+    
+    if (!ingredientId) {
+      alert('Please select an ingredient first');
+      return;
+    }
+    
+    if (!confirm(`Permanently DELETE "${ingredientName}"? This cannot be undone!`)) {
+      return;
+    }
+    
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/api/inventory/${ingredientId}`, { 
+        method: 'DELETE' 
+      });
+      
+      if (!res.ok) throw new Error('Failed to delete');
+      
+      alert(`"${ingredientName}" has been deleted! ✅`);
+      closeEditModal();
+      setTimeout(loadInventory, 400);
+    } catch (err) {
+      console.error('Failed to delete ingredient:', err);
+      alert('Failed to delete ingredient. Please try again.');
+    }
+  }
+
+  // Form submissions
+  document.getElementById('restockForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const ingredientId = document.getElementById('ingredientSelect').value;
+    const quantity = parseFloat(document.getElementById('quantity').value);
+    const unit = document.getElementById('unit').value;
+    
+    try {
+      const res = await fetch('http://127.0.0.1:5000/api/inventory/restock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_id: ingredientId, quantity, unit })
+      });
+      
+      if (!res.ok) throw new Error('Failed to log restock');
+      
+      alert('Restock logged successfully! ✅');
+      closeRestockModal();
+      setTimeout(loadInventory, 400);
+    } catch (err) {
+      console.error('Failed to log restock:', err);
+      alert('Failed to log restock. Please try again.');
+    }
+  });
+
+  document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const ingredientId = document.getElementById('editIngredient').value;
+    const currentStock = parseFloat(document.getElementById('currentStock').value);
+    const requiredStock = parseFloat(document.getElementById('requiredStock').value);
+    const category = document.getElementById('category').value;
+    
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/api/inventory/${ingredientId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          stock_level: currentStock, 
+          capacity: requiredStock, 
+          category 
+        })
+      });
+      
+      if (!res.ok) throw new Error('Failed to update');
+      
+      alert('Ingredient updated successfully! ✅');
+      closeEditModal();
+      setTimeout(loadInventory, 400);
+    } catch (err) {
+      console.error('Failed to update ingredient:', err);
+      alert('Failed to update ingredient. Please try again.');
+    }
+  });
+
+  document.getElementById('addIngredientForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const name = document.getElementById('newIngredientName').value;
+    const stock = parseFloat(document.getElementById('newCurrentStock').value);
+    const capacity = parseFloat(document.getElementById('newRequiredStock').value);
+    const category = document.getElementById('newCategory').value;
+    
+    try {
+      const res = await fetch('http://127.0.0.1:5000/api/inventory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          item_name: name, 
+          stock_level: stock, 
+          capacity, 
+          category 
+        })
+      });
+      
+      if (!res.ok) throw new Error('Failed to add ingredient');
+      
+      alert(`"${name}" added successfully! ✅`);
+      closeAddIngredientModal();
+      setTimeout(loadInventory, 400);
+    } catch (err) {
+      console.error('Failed to add ingredient:', err);
+      alert('Failed to add ingredient. Please try again.');
+    }
+  });
+
+  // Close dialogs on backdrop click
+  [restockModal, editModal, addIngredientModal].forEach(d =>
+    d.addEventListener('click', e => { if (e.target === d) d.close(); })
+  );
+  
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      const openDialog = document.querySelector('dialog[open]');
+      openDialog?.close();
+    }
+  });
+
+  // Progress class helper
+  function getProgressClass(percent) {
+    if (percent === 0) return 'progress-empty';
+    if (percent <= 20) return 'progress-bad';
+    if (percent <= 60) return 'progress-warn';
+    return 'progress-good';
+  }
+
+  // Fallback data
+  const fallbackData = {
+    perishable: [
+      { name: "Milk", percent: 70 },
+      { name: "Lettuce", percent: 10 },
+      { name: "Chicken", percent: 100 },
+      { name: "Tomato", percent: 40 },
+      { name: "Egg", percent: 90 },
+      { name: "Fresh Fruits", percent: 50 }
+    ],
+    semiperishable: [
+      { name: "Coffee Beans", percent: 60 },
+      { name: "Bread", percent: 20 },
+      { name: "Coconut Milk", percent: 80 },
+      { name: "Cocoa Powder", percent: 45 },
+      { name: "Matcha Powder", percent: 30 },
+      { name: "Mayonnaise", percent: 50 },
+      { name: "Jam", percent: 70 },
+      { name: "Cream", percent: 60 }
+    ]
+  };
+
+  function renderGroups(perishableArr, semiArr) {
+    const perishableList = document.getElementById('perishable-list');
+    const semiList = document.getElementById('semiperishable-list');
+    if (!perishableList || !semiList) return;
+
+    const makeRows = arr => arr.map(item => `
+      <div class="ingredient-row">
+        <span class="ingredient-name">${item.name}</span>
+        <div class="progress-bar">
+          <div class="progress-fill ${getProgressClass(item.percent)}" style="width:${item.percent}%"></div>
+        </div>
+      </div>
+    `).join('');
+
+    perishableList.innerHTML = perishableArr.length ? makeRows(perishableArr) : "<div class='muted'>No perishable items.</div>";
+    semiList.innerHTML = semiArr.length ? makeRows(semiArr) : "<div class='muted'>No semi‑perishable items.</div>";
+
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.progress-fill').forEach((fill, i) => {
+        const target = fill.style.width;
+        fill.style.width = '0%';
+        setTimeout(() => { fill.style.width = target; }, 80 + i * 20);
+      });
+    });
+  }
+
+  async function loadInventory() {
+    const perishableList = document.getElementById('perishable-list');
+    const semiList = document.getElementById('semiperishable-list');
+    if (!perishableList || !semiList) return;
+
+    perishableList.innerHTML = "<div class='ingredient-row loading'><span class='ingredient-name muted'>Loading...</span></div>";
+    semiList.innerHTML = "<div class='ingredient-row loading'><span class='ingredient-name muted'>Loading...</span></div>";
+
+    try {
+      const res = await fetch('http://127.0.0.1:5000/api/inventory');
+      if (!res.ok) throw new Error('Bad response');
+      const rows = await res.json();
+
+      const perishableNames = new Set([
+        'milk','lettuce','chicken','tomato','bread','egg','lemon','mushroom','fresh fruits','cream','jam'
+      ]);
+
+      const perishable = [];
+      const semi = [];
+
+      rows.forEach(r => {
+        // Skip disabled ingredients
+        if (r.status === 'disabled') return;
+        
+        const rawName = (r.item_name || '').trim();
+        const key = rawName.toLowerCase();
+        const pct = r.capacity ? Math.min(100, Math.round((r.stock_level / r.capacity) * 100)) : 0;
+        const target = r.category
+          ? (r.category.toLowerCase().includes('semi') ? semi : perishable)
+          : (perishableNames.has(key) ? perishable : semi);
+        target.push({ name: rawName, percent: pct });
+      });
+
+      renderGroups(perishable, semi);
+    } catch (err) {
+      console.warn('Inventory API failed, using fallback.', err);
+      renderGroups(fallbackData.perishable, fallbackData.semiperishable);
+    }
+  }
+
+  loadInventory();
+</script>
+</body>
+</html>

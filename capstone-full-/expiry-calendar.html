@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GastroTrack - Expiry Calendar</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --color-primary:#e14632;--color-sidebar:#ff4400;--color-sidebar-hover:#2d3341;
+      --color-text-primary:#1f2430;--color-text-secondary:#6a6a6a;
+      --color-bg-main:#f6efe6;--color-bg-card:#e2e2e2;--color-bg-card-header:#cfcfcf;--color-border:#d6d6d6;
+      --color-calendar-bg:#ff6347;--color-calendar-text:#1f2430;--color-calendar-today:#fff;
+      --color-critical:#d93e3e;--color-warning:#f1c43a;--color-caution:#e8e8e8;
+      --radius-sm:8px;--radius-md:12px;--radius-lg:18px;--radius-pill:999px;
+      --shadow-sm:0 2px 6px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.1);--shadow-lg:0 6px 14px rgba(0,0,0,.12);
+      --font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-family);color:var(--color-text-primary);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex;min-height:100vh;background:var(--color-bg-main)}
+
+    /* Sidebar */
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:140px;background:var(--color-sidebar);display:flex;flex-direction:column;padding:20px 0;box-shadow:2px 0 8px rgba(0,0,0,.1);z-index:100}
+    .brand{display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 16px 24px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:20px}
+    .logo{width:50px;height:50px;background:var(--color-primary);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(225,70,50,.3)}
+    .brand span{font-size:13px;font-weight:800;color:#fff;text-align:center;letter-spacing:-.3px}
+    .nav{display:flex;flex-direction:column;padding:0 12px}
+    .nav a{display:block;padding:14px 12px;color:rgba(255,255,255,.7);text-decoration:none;font-size:12px;font-weight:600;border-radius:var(--radius-sm);transition:.2s;text-align:center;line-height:1.3;margin-bottom:4px}
+    .nav a:hover{background:var(--color-sidebar-hover);color:#fff}
+    .nav a.active{background:var(--color-primary);color:#fff;box-shadow:0 2px 8px rgba(225,70,50,.4)}
+    .spacer{flex:1;min-height:40px}
+
+    /* Main */
+    .main{margin-left:140px;flex:1;padding:32px 40px;background:var(--color-bg-main);min-height:100vh}
+
+    /* Calendar */
+    .calendar-section{background:var(--color-calendar-bg);border-radius:var(--radius-lg);padding:24px;margin-bottom:24px;box-shadow:0 4px 16px rgba(225,70,50,.2)}
+    .calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+    .calendar-header h1{font-size:24px;font-weight:800;color:var(--color-calendar-text)}
+    .calendar-nav{display:flex;gap:8px}
+    .nav-btn{width:36px;height:36px;background:rgba(255,255,255,.2);border:none;border-radius:var(--radius-sm);color:var(--color-calendar-text);font-size:18px;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center}
+    .nav-btn:hover{background:rgba(255,255,255,.3);transform:scale(1.05)}
+    .nav-btn:active{transform:scale(.95)}
+    .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .day-header{font-size:13px;font-weight:700;color:var(--color-calendar-text);text-align:center;padding:10px 0}
+    .calendar-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);border-radius:var(--radius-sm);font-size:14px;font-weight:600;color:var(--color-calendar-text);cursor:pointer;transition:.2s;position:relative}
+    .calendar-day:hover{background:rgba(255,255,255,.25);transform:scale(1.05)}
+    .calendar-day.other-month{opacity:.4;cursor:default}
+    .calendar-day.other-month:hover{background:rgba(255,255,255,.15);transform:none}
+    .calendar-day.today{background:var(--color-calendar-today);color:var(--color-primary);font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    .calendar-day.has-expiry::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:6px;height:6px;background:var(--color-critical);border-radius:50%;box-shadow:0 0 0 2px var(--color-calendar-bg)}
+
+    /* Alerts */
+    .expiry-alerts-section{background:transparent}
+    .alerts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .expiry-item{background:#fff;border-radius:var(--radius-md);padding:16px;min-height:60px;display:flex;align-items:center;box-shadow:var(--shadow-sm);border-left:4px solid transparent;transition:.2s}
+    .expiry-item:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+    .expiry-item.expiry-critical{border-left-color:var(--color-critical);background:#fff5f5}
+    .expiry-item.expiry-warning{border-left-color:var(--color-warning);background:#fffef5}
+    .expiry-item.expiry-caution{border-left-color:var(--color-caution);background:#fafafa}
+    .expiry-content{font-size:14px;color:var(--color-text-primary);line-height:1.5}
+    .expiry-content strong{font-weight:700;color:var(--color-text-primary)}
+    .expiry-item:empty,.expiry-item .expiry-content:empty{min-height:60px}
+
+    /* Responsive */
+    @media (max-width:1200px){.alerts-grid{grid-template-columns:1fr}}
+    @media (max-width:768px){
+      .sidebar{width:80px}.brand span{font-size:11px}.nav a{padding:12px 8px;font-size:11px}
+      .main{margin-left:80px;padding:24px 20px}.calendar-header h1{font-size:20px}
+      .calendar-grid{gap:4px}.day-header{font-size:11px;padding:8px 0}.calendar-day{font-size:12px}
+    }
+    @media (max-width:480px){
+      .calendar-section{padding:16px}.calendar-header{flex-direction:column;gap:12px;align-items:flex-start}
+      .day-header{font-size:10px}.calendar-day{font-size:11px}
+    }
+
+    /* Modal */
+    .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);animation:fadeIn .3s}
+    .modal.show{display:flex;align-items:center;justify-content:center}
+    .modal-content{background:#fff;border-radius:var(--radius-lg);padding:32px;width:90%;max-width:600px;max-height:80vh;overflow-y:auto;position:relative;box-shadow:var(--shadow-lg);animation:slideIn .3s}
+    .close-btn{position:absolute;top:16px;right:24px;font-size:28px;font-weight:bold;color:var(--color-text-secondary);cursor:pointer;transition:.2s;line-height:1}
+    .close-btn:hover{color:var(--color-primary)}
+    #modal-date{font-size:24px;font-weight:800;color:var(--color-text-primary);margin-bottom:24px;padding-right:40px}
+    #modal-items{display:grid;gap:16px}
+    .modal-item{background:var(--color-bg-card);border-radius:var(--radius-md);padding:20px;border-left:4px solid var(--color-caution);transition:.2s}
+    .modal-item:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+    .modal-item.critical{border-left-color:var(--color-critical);background:#fff5f5}
+    .modal-item.warning{border-left-color:var(--color-warning);background:#fffef5}
+    .modal-item.caution{border-left-color:var(--color-caution);background:#fafafa}
+    .modal-item-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+    .modal-item-name{font-size:18px;font-weight:700;color:var(--color-text-primary)}
+    .modal-item-priority{padding:4px 12px;border-radius:var(--radius-pill);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .modal-item-priority.critical{background:var(--color-critical);color:#fff}
+    .modal-item-priority.warning{background:var(--color-warning);color:var(--color-text-primary)}
+    .modal-item-priority.caution{background:var(--color-caution);color:var(--color-text-secondary)}
+    .modal-item-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;font-size:14px;color:var(--color-text-secondary)}
+    .modal-item-detail{display:flex;flex-direction:column}
+    .modal-item-detail-label{font-weight:600;color:var(--color-text-primary);margin-bottom:4px}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes slideIn{from{opacity:0;transform:translateY(-30px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @media (max-width:768px){
+      .modal-content{padding:24px;width:95%;max-height:85vh}
+      #modal-date{font-size:20px;margin-bottom:20px}.modal-item{padding:16px}.modal-item-name{font-size:16px}
+      .modal-item-details{grid-template-columns:1fr;gap:8px}
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><span style="font-size:28px">👨🏻‍🍳</span></div>
+      <span>GastroTrack</span>
+    </div>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="dashboard.html"><span>Dashboard</span></a>
+      <a href="inventory.html"><span>Inventory</span></a>
+      <a href="expiry-calendar.html"><span>Expiry Calendar</span></a>
+      <a href="sales-report.html"><span>Sales Report</span></a>
+      <a class="active" href="cost-waste.html"><span>Cost & Waste</span></a>
+      <a href="suggestions.html"><span>Suggestions</span></a>
+      <a href="menu-insights.html"><span>Menu Insights</span></a>
+    </nav>
+
+    <div class="spacer"></div>
+    <nav class="nav">
+      <a href="profile.html"><span>Profile</span></a>
+      <a href="logout.html"><span>Log Out</span></a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <section class="calendar-section">
+      <div class="calendar-header">
+        <h1 id="currentMonth">Loading...</h1>
+        <div class="calendar-nav">
+          <button class="nav-btn" onclick="previousMonth()" aria-label="Previous month">&lt;</button>
+          <button class="nav-btn" onclick="nextMonth()" aria-label="Next month">&gt;</button>
+          <button class="nav-btn" onclick="refreshData()" aria-label="Refresh data" title="Refresh expiry data">🔄</button>
+        </div>
+      </div>
+
+      <div class="calendar-grid">
+        <div class="day-header">Sun</div><div class="day-header">Mon</div><div class="day-header">Tues</div>
+        <div class="day-header">Wed</div><div class="day-header">Thurs</div><div class="day-header">Fri</div><div class="day-header">Sat</div>
+        <div id="calendarDays" style="display: contents;"></div>
+      </div>
+    </section>
+
+    <section class="expiry-alerts-section">
+      <div id="alertsGrid" class="alerts-grid"></div>
+    </section>
+  </main>
+
+  <!-- MODAL -->
+  <div id="expiryModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2 id="modal-date">Expiry Items</h2>
+      <div id="modal-items"></div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script>
+    // ===== State =====
+    let currentDate = new Date();
+    const today = new Date();
+    let expiryData = {};    // { "YYYY-M-D": [ ... ] }
+    let expiryAlerts = [];  // [ ... ]
+    let isClosingModal = false;
+    let isModalOpen = false;
+
+    // ===== API CONFIG =====
+    const API_CONFIG = {
+      expiryData:  'http://localhost:5000/api/expiry-data',
+      expiryAlerts:'http://localhost:5000/api/expiry-alerts',
+      addItem:     'http://localhost:5000/api/inventory/add',
+      updateItem:  'http://localhost:5000/api/inventory/update',
+      deleteItem:  'http://localhost:5000/api/inventory/delete'
+    };
+
+    // ===== Utils =====
+    function getMonthName(i){return['January','February','March','April','May','June','July','August','September','October','November','December'][i];}
+    function calculateDaysUntilExpiry(expiryDate){const e=new Date(expiryDate);return Math.ceil((e-new Date())/(1000*60*60*24));}
+    function getPriorityLevel(d){if(d<=1)return'critical';if(d<=3)return'warning';return'caution';}
+
+    // ===== Fetch (no mocks) =====
+    async function fetchExpiryData(){
+      const res=await fetch(API_CONFIG.expiryData,{headers:{'Content-Type':'application/json'}});
+      if(!res.ok) throw new Error(`expiry-data HTTP ${res.status}`);
+      const data=await res.json();
+      // Common shapes:
+      expiryData   = data.calendarData || data.calendar_data || {};
+      expiryAlerts = data.alertsData   || data.alerts_data   || [];
+    }
+    async function fetchExpiryAlerts(){
+      const res=await fetch(API_CONFIG.expiryAlerts,{headers:{'Content-Type':'application/json'}});
+      if(!res.ok) throw new Error(`expiry-alerts HTTP ${res.status}`);
+      const data=await res.json();
+      expiryAlerts = data.alerts || data.alertsData || [];
+    }
+
+    // ===== Error banner =====
+    function showErrorMessage(msg){
+      document.getElementById('alertsGrid').innerHTML =
+        `<div class="expiry-item expiry-warning"><div class="expiry-content"><strong>⚠️ Error:</strong> ${msg}</div></div>`;
+    }
+
+    // ===== Rendering =====
+    function renderCalendar(){
+      const year=currentDate.getFullYear(), month=currentDate.getMonth();
+      document.getElementById('currentMonth').textContent=`${getMonthName(month)} ${year}`;
+
+      const firstDay=new Date(year,month,1).getDay();
+      const daysInMonth=new Date(year,month+1,0).getDate();
+      const daysInPrevMonth=new Date(year,month,0).getDate();
+
+      const container=document.getElementById('calendarDays');
+      container.innerHTML='';
+
+      for (let i=firstDay-1;i>=0;i--) container.appendChild(createDayElement(daysInPrevMonth-i,true,year,month-1));
+      for (let d=1; d<=daysInMonth; d++) container.appendChild(createDayElement(d,false,year,month));
+      const total=container.children.length;
+      const remain=(Math.ceil(total/7)*7)-total;
+      for (let d=1; d<=remain; d++) container.appendChild(createDayElement(d,true,year,month+1));
+    }
+
+    function createDayElement(day,isOther,year,month){
+      const el=document.createElement('div'); el.className='calendar-day'; el.textContent=day;
+      if(isOther) el.classList.add('other-month');
+
+      if(!isOther && year===today.getFullYear() && month===today.getMonth() && day===today.getDate())
+        el.classList.add('today');
+
+      const dateKey=`${year}-${month+1}-${day}`;
+      const items=expiryData[dateKey];
+      if(Array.isArray(items)&&items.length>0){
+        el.classList.add('has-expiry');
+        el.title = items.map(i=>`${i.item} (${i.quantity}) - ${i.daysUntil} day(s)`).join('\n');
+      }
+
+      if(!isOther){
+        el.onclick = () => {
+          if (isClosingModal) return; // prevent re-open from click-through
+          openExpiryModal(
+            `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`,
+            items || []
+          );
+        };
+      }
+      return el;
+    }
+
+    function renderExpiryAlerts(){
+      const grid=document.getElementById('alertsGrid'); grid.innerHTML='';
+
+      if(!Array.isArray(expiryAlerts)||expiryAlerts.length===0){
+        const empty=document.createElement('div');
+        empty.className='expiry-item expiry-caution';
+        empty.innerHTML='<div class="expiry-content">No expiring items found</div>';
+        grid.appendChild(empty);
+        return;
+      }
+
+      const order={critical:0,warning:1,caution:2};
+      [...expiryAlerts].sort((a,b)=>{
+        const ap=order[a.priority]??2, bp=order[b.priority]??2;
+        if(ap!==bp) return ap-bp;
+        return (a.daysUntil??999)-(b.daysUntil??999);
+      }).forEach(a=>{
+        const el=document.createElement('div');
+        el.className=`expiry-item expiry-${a.priority||'caution'}`;
+        const when=a.expiryDate?` (${a.expiryDate})`:'';
+        const days=(a.daysUntil??'').toString();
+        el.innerHTML=`<div class="expiry-content"><strong>${a.item} (${a.quantity})</strong> expiring in <strong>${days} day(s)</strong>${when}</div>`;
+        grid.appendChild(el);
+      });
+
+      const max=8, remain=Math.max(0,max-expiryAlerts.length);
+      for(let i=0;i<remain;i++){
+        const slot=document.createElement('div');
+        slot.className='expiry-item expiry-caution';
+        slot.innerHTML='<div class="expiry-content"></div>';
+        grid.appendChild(slot);
+      }
+    }
+
+    // ===== Modal (click-through safe) =====
+    function openExpiryModal(date,items){
+      const modal=document.getElementById('expiryModal');
+      const modalDate=document.getElementById('modal-date');
+      const modalItems=document.getElementById('modal-items');
+      if(!modal||!modalDate||!modalItems) return;
+
+      isClosingModal = false;
+      isModalOpen = true;
+
+      const dateObj=new Date(date);
+      modalDate.textContent=`Items expiring on ${dateObj.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
+
+      modalItems.innerHTML='';
+      if(!items.length){ modalItems.innerHTML='<p>No items found for this date.</p>'; }
+      else{
+        items.forEach(item=>{
+          const pr=item.priority||getPriorityLevel(item.daysUntil);
+          const div=document.createElement('div');
+          div.className=`modal-item ${pr}`;
+          div.innerHTML=`
+            <div class="modal-item-header">
+              <div class="modal-item-name">${item.item}</div>
+              <div class="modal-item-priority ${pr}">${pr}</div>
+            </div>
+            <div class="modal-item-details">
+              <div class="modal-item-detail">
+                <div class="modal-item-detail-label">Quantity</div>
+                <div>${item.quantity}</div>
+              </div>
+              <div class="modal-item-detail">
+                <div class="modal-item-detail-label">Days Until Expiry</div>
+                <div>${item.daysUntil} day(s)</div>
+              </div>
+              <div class="modal-item-detail">
+                <div class="modal-item-detail-label">Category</div>
+                <div>${item.category||'N/A'}</div>
+              </div>
+              <div class="modal-item-detail">
+                <div class="modal-item-detail-label">Location</div>
+                <div>${item.location||'N/A'}</div>
+              </div>
+            </div>`;
+          modalItems.appendChild(div);
+        });
+      }
+
+      modal.classList.add('show');
+      modal.style.display='flex';
+    }
+
+    function closeExpiryModal(){
+      const modal=document.getElementById('expiryModal');
+      if(!modal) return;
+
+      isClosingModal = true;
+      isModalOpen = false;
+
+      // Hide immediately to avoid click-through re-opening
+      modal.style.display = 'none';
+      modal.classList.remove('show');
+
+      // Allow clicks again shortly after
+      setTimeout(()=>{ isClosingModal = false; }, 150);
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      const modal=document.getElementById('expiryModal');
+      const closeBtn=document.querySelector('.close-btn');
+
+      if(closeBtn){
+        closeBtn.addEventListener('click',(e)=>{
+          e.stopPropagation(); // don't bubble to backdrop or calendar
+          closeExpiryModal();
+        });
+      }
+
+      if(modal){
+        modal.addEventListener('click',(e)=>{
+          if(e.target===modal){
+            e.stopPropagation();
+            closeExpiryModal();
+          }
+        });
+      }
+
+      document.addEventListener('keydown',(e)=>{
+        if(e.key==='Escape' && isModalOpen) closeExpiryModal();
+      });
+    });
+
+    // Expose minimal debug hooks
+    window.gastroTrackCalendar = {
+      refreshData,
+      openExpiryModal,
+      closeExpiryModal,
+      expiryData: () => expiryData,
+      expiryAlerts: () => expiryAlerts
+    };
+
+    // Controls
+    function previousMonth(){ currentDate.setMonth(currentDate.getMonth()-1); renderCalendar(); }
+    function nextMonth(){ currentDate.setMonth(currentDate.getMonth()+1); renderCalendar(); }
+
+    async function refreshData(){
+      try{ await fetchExpiryData(); }
+      catch(e1){ console.error(e1); try{ await fetchExpiryAlerts(); } catch(e2){ console.error(e2); } }
+      finally{ renderCalendar(); renderExpiryAlerts(); }
+    }
+
+    async function initializeApp(){
+      try{ await fetchExpiryData(); }
+      catch(err){
+        console.error('Initialization error:', err);
+        expiryData={}; expiryAlerts=[];
+        showErrorMessage('Unable to load expiry data from server.');
+      } finally {
+        renderCalendar(); renderExpiryAlerts();
+      }
+    }
+
+    // Boot
+    window.addEventListener('load', initializeApp);
+    if(document.readyState==='complete') initializeApp();
+  </script>
+</body>
+</html>

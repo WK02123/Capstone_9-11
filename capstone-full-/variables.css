@@ -1,0 +1,96 @@
+/* CSS Variables - Global Design System */
+:root {
+  /* Brand Colors */
+  --primary-color: #ff471f;
+  --primary-dark: #e64a26;
+  --secondary-color: #5ce1e6;
+  --secondary-dark: #25c3d9;
+  
+  /* Background Colors */
+  --bg-primary: #fdf7ee;
+  --bg-card: #ceffff;
+  --bg-card-alt: #b7f0f8;
+  --bg-prediction: #0d6b74;
+  
+  /* Text Colors */
+  --text-primary: #0e1116;
+  --text-muted: #6b7280;
+  --text-white: #fff;
+  
+  /* Status Colors */
+  --status-success: #7dd56f;
+  --status-warning: #f6c247;
+  --status-error: #ef4444;
+  
+  /* UI Elements */
+  --border-radius: 28px;
+  --border-radius-sm: 12px;
+  --border-radius-lg: 36px;
+  --shadow: 0 10px 30px rgba(0,0,0,.08);
+  --shadow-sm: 0 4px 15px rgba(0,0,0,.1);
+  --shadow-lg: 0 24px 60px rgba(0,0,0,.25);
+  
+  /* Spacing */
+  --spacing-xs: 6px;
+  --spacing-sm: 12px;
+  --spacing-md: 18px;
+  --spacing-lg: 28px;
+  --spacing-xl: 40px;
+  
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 24px;
+  
+  /* Transitions */
+  --transition-fast: 0.12s ease;
+  --transition-normal: 0.3s ease;
+}
+
+:root{
+  --brand: #f24a2e;        /* orange-red background */
+  --brand-600:#d63f26;
+  --ink:#1a1a1a;
+  --muted:#6f7380;
+  --surface:#f7f1ea;       /* warm off-white card */
+  --line:#e7d7c9;
+  --focus:#f24a2e;
+  --btn:#3a3a3a;
+  --btn-text:#ffffff;
+  --radius: 12px;
+  --shadow: 0 10px 30px rgba(0,0,0,.12);
+  --font: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+:root{
+  --brand: #f24a2e;         /* page background */
+  --surface: #f7f1ea;       /* cards / app bg */
+  --ink: #1b1b1b;
+  --muted: #81858f;
+  --line: #e3d9cc;
+
+  --sidebar-bg: #ff5a39;    /* left rail */
+  --sidebar-ink: #ffffff;
+  --sidebar-active: #eae4da;
+
+  --btn: #3a3a3a;
+  --btn-ink: #ffffff;
+  --btn-soft: #ffffff22;
+
+  --good: #31c24a;
+  --warn: #ffb020;
+  --bad:  #e55454;
+
+  --bubble: #3f6b86;        /* top left card tint */
+  --bubble-ink: #ffffff;
+
+  --radius: 14px;
+  --shadow-1: 0 10px 30px rgba(0,0,0,.10);
+  --shadow-2: 0 16px 40px rgba(0,0,0,.18);
+
+  --font: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+

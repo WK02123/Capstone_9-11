@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - GastroTrack</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{ --brand:#f24a2e; --surface:#f7f1ea; --ink:#1a1a1a; --border:#ea4b30; --btn:#3a3a3a; --font:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:var(--brand);color:var(--ink);font-family:var(--font);display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{width:min(480px,90vw);background:var(--surface);border:1px solid #eadfce;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.12);padding:38px 32px 28px;text-align:center;position:relative}
+    .logo-wrap{position:relative;width:110px;margin:4px auto 14px}
+    .logo{width:110px;height:110px;display:block;margin:0 auto}
+    .logo-wrap .badge{position:absolute;left:-8px;top:8px;width:8px;height:8px;background:#e4321b;border-radius:50%;box-shadow:0 0 0 2px var(--surface)}
+    input[type="text"],input[type="password"]{width:100%;height:36px;font-size:13px;border:2px solid var(--border);border-radius:6px;padding:8px 12px;outline:none;background:#fff}
+    .input-wrap{position:relative;margin-top:10px} .input-wrap input{padding-right:40px}
+    .eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:28px;height:22px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;background-repeat:no-repeat;background-position:center;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2'%3E%3Cpath d='M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E")}
+    .eye.is-on{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2'%3E%3Cpath d='M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.77 21.77 0 0 1 5.06-6.94'/%3E%3Cpath d='M1 1l22 22'/%3E%3C/svg%3E")}
+    .row{margin-top:10px;display:flex;align-items:center;justify-content:space-between;font-size:12px}
+    .remember{display:flex;align-items:center;gap:6px} .remember input{appearance:none;width:14px;height:14px;border:2px solid var(--border);border-radius:2px;background:#fff;cursor:pointer;position:relative}
+    .remember input:checked{background:var(--border)} .remember input:checked::after{content:"";position:absolute;left:3px;top:0;width:6px;height:10px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(45deg)}
+    .forget{color:#b4482f;text-decoration:none}
+    .btn{width:80px;height:34px;border:0;border-radius:6px;background:#3c3c3c;color:#fff;font-weight:600;font-size:12px;margin:20px auto 6px;display:block;cursor:pointer}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .meta{font-size:12px;color:#7b7f86;margin-top:8px}.meta a{color:#d0553f;text-decoration:none;font-weight:600}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.18);display:none;align-items:center;justify-content:center;padding:16px}
+    .overlay.show{display:flex}
+    .modal{width:min(380px,92vw);background:#e9e6e6;border:4px solid #575757;border-radius:10px;box-shadow:0 15px 40px rgba(0,0,0,.25);text-align:center;padding:18px 16px 16px}
+    .modal p{margin:0 0 14px;font-size:13px;font-weight:700;color:#c0392b;white-space:pre-line}
+    .ok{background:#555;color:#fff;border:0;border-radius:6px;padding:8px 22px;font-weight:700;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-wrap">
+      <span class="badge"></span>
+      <img src="img/logo.png" alt="GastroTrack Logo" class="logo">
+    </div>
+
+    <form id="loginForm" method="post" action="do_login.py">
+      <input type="text" name="user" id="loginUser" placeholder="User ID/Email" autocomplete="username" />
+      <div class="input-wrap">
+        <input type="password" name="pass" id="loginPwd" placeholder="Password" autocomplete="current-password" />
+        <button type="button" class="eye" aria-label="Show password" data-target="loginPwd"></button>
+      </div>
+      <div class="row">
+        <label class="remember"><input type="checkbox" name="remember" id="rememberMe" /><span>Remember me</span></label>
+        <a href="#" class="forget">Forget password?</a>
+      </div>
+      <button id="loginBtn" class="btn" disabled>Sign in</button>
+      <p class="meta">Don’t have account? <a href="role.html">Sign up here</a></p>
+    </form>
+  </div>
+
+  <!-- error popup (shown via ?err= message or JS) -->
+  <div class="overlay" id="err"><div class="modal"><p id="errMsg">Incorrect password or username\nplease try again.</p><button class="ok" id="okBtn">OK</button></div></div>
+
+  <script>
+    const u = document.getElementById('loginUser');
+    const p = document.getElementById('loginPwd');
+    const btn = document.getElementById('loginBtn');
+    const eye = document.querySelector('.eye');
+    const err = document.getElementById('err');
+    const errMsg = document.getElementById('errMsg');
+    const okBtn = document.getElementById('okBtn');
+
+    function toggle(){ btn.disabled = !(u.value.trim() && p.value.trim()); }
+    ['input','change','keyup'].forEach(e=>{ u.addEventListener(e,toggle); p.addEventListener(e,toggle); });
+    toggle();
+
+    eye.addEventListener('click', ()=>{ const show = p.type==='password'; p.type = show?'text':'password'; eye.classList.toggle('is-on', show); });
+    okBtn.addEventListener('click', ()=> err.classList.remove('show'));
+    err.addEventListener('click', e=>{ if(e.target===err) err.classList.remove('show'); });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') err.classList.remove('show'); });
+
+    // If server redirected with ?err=... show popup
+    const params = new URLSearchParams(location.search);
+    if (params.has('err')) { errMsg.textContent = params.get('err'); err.classList.add('show'); history.replaceState({}, "", "loginpage.html"); }
+  </script>
+</body>
+</html>

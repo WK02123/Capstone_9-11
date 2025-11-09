@@ -1,0 +1,692 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GastroTrack - Profile</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== CSS VARIABLES ===== */
+    :root {
+      /* Colors */
+      --color-primary: #e14632;
+      --color-sidebar: #ff4400;
+      --color-sidebar-hover: #2d3341;
+      --color-text-primary: #1f2430;
+      --color-text-secondary: #6a6a6a;
+      --color-bg-main: #f6efe6;
+      --color-bg-card: #c5f0f0;
+      --color-bg-card-header: #cfcfcf;
+      --color-border: #d6d6d6;
+      --color-cyan: #7dd3d3;
+      
+      /* Spacing */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 12px;
+      --spacing-lg: 18px;
+      --spacing-xl: 24px;
+      
+      /* Border radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      
+      /* Shadows */
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 6px 14px rgba(0, 0, 0, 0.12);
+      
+      /* Typography */
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      min-height: 100vh;
+      background: var(--color-bg-main);
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 140px;
+      background: var(--color-sidebar);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 0;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      background: var(--color-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(225, 70, 50, 0.3);
+    }
+
+    .brand span {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      letter-spacing: -0.3px;
+    }
+
+    /* ===== NAVIGATION ===== */
+    .nav {
+      display: flex;
+      flex-direction: column;
+      padding: 0 12px;
+    }
+
+    .nav a {
+      position: relative;
+      display: block;
+      padding: 14px 12px;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+      text-align: center;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    .nav a:hover {
+      background: var(--color-sidebar-hover);
+      color: #fff;
+    }
+
+    .nav a.active {
+      background: var(--color-primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(225, 70, 50, 0.4);
+    }
+
+    .spacer {
+      flex: 1;
+      min-height: 40px;
+    }
+
+    /* ===== MAIN CONTENT AREA ===== */
+    .main {
+      margin-left: 140px;
+      flex: 1;
+      padding: 32px 160px 32px 40px;
+      background: var(--color-bg-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ===== PROFILE CARD ===== */
+    .profile-card {
+      background: var(--color-bg-card);
+      border: 2px solid #a5d5d5;
+      border-radius: var(--radius-lg);
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* ===== PROFILE AVATAR ===== */
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .profile-avatar::after {
+      content: '👨🏻';
+      font-size: 64px;
+      position: absolute;
+    }
+
+    /* ===== PROFILE FIELDS ===== */
+    .profile-field {
+      background: white;
+      border: 2px solid #2c3e50;
+      border-radius: var(--radius-sm);
+      padding: 12px 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    /* ===== ROLE BADGE ===== */
+    .role-badge {
+      background: var(--color-primary);
+      color: white;
+      padding: 8px 32px;
+      border-radius: var(--radius-pill);
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(225, 70, 50, 0.3);
+    }
+
+    /* ===== USER ID ===== */
+    .user-id {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-top: -8px;
+    }
+
+    /* ===== PROFILE ACTIONS ===== */
+    .profile-actions {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .btn-manage,
+    .btn-edit {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-manage {
+      background: var(--color-primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(225, 70, 50, 0.3);
+    }
+
+    .btn-manage:hover {
+      background: #c93a28;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(225, 70, 50, 0.4);
+    }
+
+    .btn-edit {
+      background: var(--color-cyan);
+      color: var(--color-text-primary);
+      box-shadow: 0 4px 12px rgba(125, 211, 211, 0.3);
+    }
+
+    .btn-edit:hover {
+      background: #6bc5c5;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(125, 211, 211, 0.4);
+    }
+
+    .btn-manage:active,
+    .btn-edit:active {
+      transform: translateY(0);
+    }
+
+    /* ===== SIDE ACTIONS ===== */
+    .side-actions {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 50;
+    }
+
+    .side-btn {
+      background: var(--color-cyan);
+      color: var(--color-text-primary);
+      border: 2px solid #6bc5c5;
+      border-radius: var(--radius-md);
+      padding: 20px 16px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 1.3;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100px;
+      min-height: 80px;
+      box-shadow: 0 4px 12px rgba(125, 211, 211, 0.3);
+      letter-spacing: 0.3px;
+    }
+
+    .side-btn:hover {
+      background: #6bc5c5;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(125, 211, 211, 0.4);
+    }
+
+    .side-btn:active {
+      transform: translateY(0);
+    }
+
+    .side-btn-empty {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    .side-btn-empty:hover {
+      background: var(--color-cyan);
+      transform: none;
+      box-shadow: 0 4px 12px rgba(125, 211, 211, 0.3);
+    }
+
+    /* ===== MODAL STYLES ===== */
+    .modal-dialog {
+      border: none;
+      border-radius: var(--radius-lg);
+      padding: 0;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-dialog::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+      padding: 28px;
+    }
+
+    .modal-content h3 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: var(--font-family);
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(225, 70, 50, 0.1);
+    }
+
+    .form-control:read-only {
+      background: #f5f5f5;
+      color: var(--color-text-secondary);
+      cursor: not-allowed;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font-family);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-cancel {
+      background: #e2e2e2;
+      color: var(--color-text-primary);
+    }
+
+    .btn-cancel:hover {
+      background: #d5d5d5;
+    }
+
+    .btn-submit {
+      background: var(--color-primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(225, 70, 50, 0.3);
+    }
+
+    .btn-submit:hover {
+      background: #c93a28;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(225, 70, 50, 0.4);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    /* ===== STAFF INFO ===== */
+    .staff-info {
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: var(--radius-sm);
+      margin-bottom: 20px;
+    }
+
+    .staff-info p {
+      margin-bottom: 12px;
+      color: var(--color-text-primary);
+      font-size: 14px;
+    }
+
+    .staff-info ul {
+      margin-left: 20px;
+      color: var(--color-text-secondary);
+    }
+
+    .staff-info li {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 1200px) {
+      .main {
+        padding: 32px 40px;
+      }
+
+      .side-actions {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 80px;
+      }
+      
+      .brand span {
+        font-size: 11px;
+      }
+      
+      .nav a {
+        padding: 12px 8px;
+        font-size: 11px;
+      }
+      
+      .main {
+        margin-left: 80px;
+        padding: 24px 20px;
+      }
+
+      .profile-card {
+        padding: 32px 24px;
+      }
+
+      .profile-avatar {
+        width: 100px;
+        height: 100px;
+      }
+
+      .profile-avatar::after {
+        font-size: 52px;
+      }
+
+      .profile-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+    <aside class="sidebar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><span style="font-size:28px">👨🏻‍🍳</span></div>
+      <span>GastroTrack</span>
+    </div>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="dashboard.html"><span>Dashboard</span></a>
+      <a href="inventory.html"><span>Inventory</span></a>
+      <a href="expiry-calendar.html"><span>Expiry Calendar</span></a>
+      <a href="sales-report.html"><span>Sales Report</span></a>
+      <a href="cost-waste.html"><span>Cost & Waste</span></a>
+      <a href="suggestions.html"><span>Suggestions</span></a>
+      <a href="menu-insights.html"><span>Menu Insights</span></a>
+    </nav>
+
+    <div class="spacer"></div>
+    <nav class="nav">
+      <a class="active" href="profile.html"><span>Profile</span></a>
+      <a href="logout.html"><span>Log Out</span></a>
+    </nav>
+  </aside>
+  
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="profile-avatar"></div>
+
+      <!-- Username (from session) -->
+      <div class="profile-field">
+        <span id="username">@<?php echo htmlspecialchars($displayName, ENT_QUOTES, 'UTF-8'); ?></span>
+      </div>
+
+      <!-- Real Name -->
+      <div class="profile-field">
+        <span id="realname"><?php echo htmlspecialchars($displayName, ENT_QUOTES, 'UTF-8'); ?></span>
+      </div>
+
+      <!-- Role Badge -->
+      <div class="role-badge">Admin</div>
+
+      <!-- Restaurant Name -->
+      <div class="profile-field">
+        <span id="restaurant">Goodluck Cafe</span>
+      </div>
+
+      <!-- User ID -->
+      <div class="user-id">ID: <span id="userid"><?php echo htmlspecialchars($_SESSION['uid'], ENT_QUOTES, 'UTF-8'); ?></span></div>
+
+      <!-- Action Buttons -->
+      <div class="profile-actions">
+        <button class="btn-manage" onclick="openManageStaffModal()">MANAGE STAFF</button>
+        <button class="btn-edit" onclick="openEditProfileModal()">EDIT PROFILE</button>
+      </div>
+    </div>
+
+    <!-- Side Actions -->
+    <div class="side-actions">
+      <button class="side-btn" onclick="exportSalesData()">EXPORT<br>SALES DATA</button>
+      <button class="side-btn side-btn-empty"></button>
+      <button class="side-btn side-btn-empty"></button>
+    </div>
+  </main>
+
+  <!-- Edit Profile Modal -->
+  <dialog id="editProfileModal" class="modal-dialog">
+    <div class="modal-content">
+      <h3>Edit Profile</h3>
+      <form id="editProfileForm">
+        <div class="form-group">
+          <label for="editUsername">Username (Cannot be changed)</label>
+          <input type="text" id="editUsername" class="form-control" placeholder="@username" readonly>
+        </div>
+        <div class="form-group">
+          <label for="editRealname">Real Name</label>
+          <input type="text" id="editRealname" class="form-control" placeholder="Your Name" required>
+        </div>
+        <div class="form-group">
+          <label for="editRestaurant">Restaurant Name</label>
+          <input type="text" id="editRestaurant" class="form-control" placeholder="Restaurant Name" required>
+        </div>
+        <div class="form-group">
+          <label for="editPassword">New Password (Optional)</label>
+          <input type="password" id="editPassword" class="form-control" placeholder="Leave blank to keep current password">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-cancel" onclick="closeEditProfileModal()">Cancel</button>
+          <button type="submit" class="btn btn-submit">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Manage Staff Modal -->
+  <dialog id="manageStaffModal" class="modal-dialog">
+    <div class="modal-content">
+      <h3>Manage Staff</h3>
+      <div class="staff-info">
+        <p>Staff management feature coming soon.</p>
+        <p>Here you will be able to:</p>
+        <ul>
+          <li>View all staff members</li>
+          <li>Add new staff</li>
+          <li>Edit staff details</li>
+          <li>Remove staff</li>
+        </ul>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-submit" onclick="closeManageStaffModal()">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- JavaScript -->
+  <script>
+    // Pre-fill modal with current display values
+    function openEditProfileModal() {
+      const modal = document.getElementById('editProfileModal');
+      document.getElementById('editUsername').value = document.getElementById('username').textContent;
+      document.getElementById('editRealname').value = document.getElementById('realname').textContent;
+      document.getElementById('editRestaurant').value = document.getElementById('restaurant').textContent;
+      modal.showModal();
+    }
+
+    function closeEditProfileModal() {
+      document.getElementById('editProfileModal').close();
+      document.getElementById('editProfileForm').reset();
+    }
+
+    function openManageStaffModal() {
+      document.getElementById('manageStaffModal').showModal();
+    }
+
+    function closeManageStaffModal() {
+      document.getElementById('manageStaffModal').close();
+    }
+
+    function exportSalesData() {
+      alert('Exporting sales data...\n\nThis feature will generate a comprehensive sales report in CSV or Excel format.');
+    }
+
+    // Handle edit profile form submission
+    document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Update display values
+      document.getElementById('realname').textContent = document.getElementById('editRealname').value;
+      document.getElementById('restaurant').textContent = document.getElementById('editRestaurant').value;
+      
+      // TODO: Send to backend via AJAX
+      console.log('Profile updated:', {
+        realname: document.getElementById('editRealname').value,
+        restaurant: document.getElementById('editRestaurant').value,
+        password: document.getElementById('editPassword').value
+      });
+      
+      alert('Profile updated successfully! ✅');
+      closeEditProfileModal();
+    });
+
+    // Close modals on backdrop click
+    document.getElementById('editProfileModal').addEventListener('click', function(e) {
+      if (e.target === this) closeEditProfileModal();
+    });
+
+    document.getElementById('manageStaffModal').addEventListener('click', function(e) {
+      if (e.target === this) closeManageStaffModal();
+    });
+
+    // Close modals on ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeEditProfileModal();
+        closeManageStaffModal();
+      }
+    });
+  </script>
+</body>
+</html>

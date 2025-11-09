@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up - GastroTrack</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ========== VARIABLES ========== */
+    :root{
+      --brand:#f24a2e;       /* orange background */
+      --surface:#f7f1ea;     /* card color */
+      --ink:#1a1a1a;
+      --border:#ea4b30;      /* input red */
+      --btn:#3a3a3a;         /* dark button */
+      --radius:10px;
+      --font:"Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+
+    /* ========== BASE ========== */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:var(--font);color:var(--ink);}
+    body{
+      background:var(--brand);
+      display:flex;align-items:center;justify-content:center;
+      padding:24px;
+    }
+
+    /* ========== CARD ========== */
+    .card{
+      width:min(520px, 92vw);
+      background:var(--surface);
+      border-radius:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.12);
+      padding:34px 32px 26px;
+      text-align:center;
+      border:1px solid #eadfce;
+    }
+
+    /* Logo with small red badge like the login page */
+    .logo-wrap{position:relative;width:110px;margin:4px auto 12px;}
+    .logo{width:110px;height:110px;display:block;margin:0 auto;}
+    .badge{
+      position:absolute;left:-8px;top:8px;width:8px;height:8px;background:#e4321b;border-radius:50%;
+      box-shadow:0 0 0 2px var(--surface);
+    }
+
+    h2{margin:0 0 8px 0;font-size:18px;font-weight:700}
+
+    /* Inputs */
+    input[type="text"], input[type="email"], input[type="password"]{
+      width:100%; height:36px; font-size:13px;
+      border:2px solid var(--border); border-radius:6px;
+      padding:8px 12px; outline:none; background:#fff;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    input:focus{ box-shadow:0 0 0 2px rgba(234,75,48,.15); }
+    input::placeholder{color:#999}
+
+    /* Two-column for first/last name */
+    .row-2{
+      display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px;
+    }
+    .field{ margin-top:10px; }
+
+    /* Password eye */
+    .input-wrap{ position:relative; }
+    .input-wrap input{ padding-right:40px; }
+    .eye{
+      position:absolute; right:8px; top:50%; transform:translateY(-50%);
+      width:28px; height:22px; border:1px solid #ccc; border-radius:6px; background:#fff; cursor:pointer;
+      background-repeat:no-repeat; background-position:center;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+    }
+    .eye.is-on{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.77 21.77 0 0 1 5.06-6.94'/%3E%3Cpath d='M1 1l22 22'/%3E%3C/svg%3E");
+    }
+
+    /* Button */
+    .btn{
+      width:130px; height:34px; margin:16px auto 8px; display:block;
+      border:0; border-radius:6px; background:var(--btn); color:#fff;
+      font-weight:700; font-size:12px; cursor:pointer;
+    }
+    .btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+    /* Meta link */
+    .meta{font-size:12px; color:#7b7f86; margin-top:4px;}
+    .meta a{color:#d0553f; text-decoration:none; font-weight:600;}
+    .meta a:hover{text-decoration:underline;}
+
+    /* Small screens: stack first/last */
+    @media (max-width:470px){
+      .row-2{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="logo-wrap">
+      <span class="badge"></span>
+      <img src="img/logo.png" alt="GastroTrack Logo" class="logo">
+    </div>
+
+    <!-- Title (optional, can be removed to perfectly match screenshot spacing) -->
+    <!-- <h2>Create Account</h2> -->
+
+    <div class="row-2">
+      <input type="text" id="fname" placeholder="First Name" autocomplete="given-name">
+      <input type="text" id="lname" placeholder="Last Name" autocomplete="family-name">
+    </div>
+
+    <div class="field">
+      <input type="text" id="uname" placeholder="Username" autocomplete="username">
+    </div>
+
+    <div class="field">
+      <input type="email" id="email" placeholder="Email" autocomplete="email">
+    </div>
+
+    <div class="field input-wrap">
+      <input type="password" id="pwd" placeholder="Password" autocomplete="new-password">
+      <button type="button" class="eye" aria-label="Show password" data-target="pwd"></button>
+    </div>
+
+    <button id="createBtn" class="btn" disabled>Create Account</button>
+
+    <p class="meta">Already have an account? <a href="loginpage.html">Login here</a></p>
+  </div>
+
+  <script>
+    // Enable button only when all fields are filled & email looks valid
+    const ids = ['fname','lname','uname','email','pwd'];
+    const fields = ids.map(id => document.getElementById(id));
+    const createBtn = document.getElementById('createBtn');
+
+    function looksEmail(v){ return /\S+@\S+\.\S+/.test(v); }
+    function toggle(){
+      const ok = fields.every(i => i.value.trim()) && looksEmail(document.getElementById('email').value.trim());
+      createBtn.disabled = !ok;
+    }
+    fields.forEach(el => ['input','change','keyup'].forEach(e => el.addEventListener(e, toggle)));
+    toggle();
+
+    // Show/hide password
+    document.querySelectorAll('.eye').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const input = document.getElementById(btn.getAttribute('data-target'));
+        const isPwd = input.type === 'password';
+        input.type = isPwd ? 'text' : 'password';
+        btn.classList.toggle('is-on', !isPwd);
+        input.focus();
+      });
+    });
+
+    // Submit handler (replace with real backend call)
+    createBtn.addEventListener('click', ()=>{
+      // TODO: send data via fetch() to your PHP endpoint to create the user
+      alert('Create Account clicked (wire this to your signup backend).');
+    });
+  </script>
+</body>
+</html>
